@@ -8,8 +8,6 @@ var app = express()
 // LOG THE REQUESTS IN DEV MODE FOR NOW
 app.use(morgan('dev'))
 
-debug('hello')
-
 var TubeStatus = require('./lib/TubeStatus.js').TubeStatus;
 var SupportedLines = require('./lib/SupportedLines.js')
 
@@ -31,7 +29,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/lines/:id', (req, res, next) => {
-	TubeStatus(req, res, next)
+	TubeStatus(req.params.id).then(data => {
+		res.send(data)
+	})
 })
 
 
