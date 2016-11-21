@@ -4,19 +4,22 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "setup-db": "node models/setup.js",
+    "start-dynamo": "cd ~/amazondynamodb;java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb",
+    "reset-db": "aws dynamodb delete-table --table-name line-status --endpoint-url http://localhost:8000; node models/setup.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "debug": "^2.3.2",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
     "morgan": "^1.7.0",
-    "request": "^2.78.0",
-    "debug": "^2.3.2"
+    "request": "^2.78.0"
   },
   "devDependencies": {
-    "debug": "^2.3.2",
-    "request-debug": "^0.2.0"
+    "aws-sdk": "^2.7.5",
+    "debug": "^2.3.2"
   }
 }
