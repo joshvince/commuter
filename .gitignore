@@ -1,6 +1,9 @@
 # Env
 .env
 
+# Local DynamoDB
+db
+
 # Logs
 logs
 *.log

@@ -13,8 +13,8 @@ var fakeTflServer = require('./fakeTflServer.js')
 fakeTflServer();
 
 var TubeStatus = require('./lib/TubeStatus.js').TubeStatus;
-var SupportedLines = require('./lib/SupportedLines.js')
-var lines = SupportedLines()
+var SupportedLines = require('./lib/SupportedLines.js')();
+var line = require('./models/line.js')
 
 
 // RENDER A BASIC HOMEPAGE AT ROOT 
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     })
   }
   
-  res.send(title + links(lines))
+  res.send(title + links(SupportedLines))
 })
 
 app.get('/lines/:id', (req, res, next) => {
@@ -36,7 +36,6 @@ app.get('/lines/:id', (req, res, next) => {
     res.send(data)
   })
 })
-
 
 // ERROR HANDLER
 app.use((err, req, res, next) => {
