@@ -12,9 +12,9 @@ app.use(morgan('dev'))
 var fakeTflServer = require('./fakeTflServer.js')
 fakeTflServer();
 
-var TubeStatus = require('./lib/TubeStatus.js').TubeStatus;
+var LineStatus = require('./lib/LineStatus.js');
 var SupportedLines = require('./lib/SupportedLines.js')();
-var line = require('./models/line.js')
+var database = require('./models/database.js')
 
 
 // RENDER A BASIC HOMEPAGE AT ROOT 
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/lines/:id', (req, res, next) => {
-  TubeStatus(req.params.id).then(data => {
+  LineStatus.updateStatus(req.params.id).then(data => {
     res.send(data)
   })
 })
