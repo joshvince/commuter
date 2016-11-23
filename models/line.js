@@ -43,7 +43,6 @@ function updateArrayInDb(array, itemName, tableName){
   var expr = "set info.scoreArray = :s"
   var values = { ":s": stringyArray }
   return db.update(item, expr, values, tableName).then(response => {
-    console.log(`added to the database. Received this: \n`, JSON.stringify(response))
     return response.Attributes.info.scoreArray
   })
 }

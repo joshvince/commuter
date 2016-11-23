@@ -1,8 +1,8 @@
 const debug = require('debug')('database')
 var AWS = require('aws-sdk');
 AWS.config.update({
-  region: "eu-ireland", 
-  endpoint: "http://localhost:8000"
+  region: process.env.AWS_REGION, 
+  endpoint: process.env.AWS_ENDPOINT
 })
 
 const Dynamo = new AWS.DynamoDB.DocumentClient();
@@ -68,7 +68,7 @@ function updateInDB(item, updateExpression, expressionValues, table){
         reject(err);
       }
       else {
-        debug(`Updated successfully and received this data back: ` + data)
+        debug(`Updated successfully and received this data back: ` + JSON.stringify(data))
         resolve(data);
       }
     })
