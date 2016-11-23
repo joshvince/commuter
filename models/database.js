@@ -1,10 +1,12 @@
-const debug = require('debug')('database')
+var dotenv = require('dotenv')
+dotenv.load()
 var AWS = require('aws-sdk');
 AWS.config.update({
   region: process.env.AWS_REGION, 
   endpoint: process.env.AWS_ENDPOINT
 })
 
+const debug = require('debug')('database')
 const Dynamo = new AWS.DynamoDB.DocumentClient();
 
 function writeToDB(item, table){
@@ -23,7 +25,7 @@ function writeToDB(item, table){
         }
         else {
           console.log("created record");
-          debug(`the record created was: \n` + result)
+          debug(`the record created was: \n` + JSON.stringify(result))
           resolve(result);
         }
       })

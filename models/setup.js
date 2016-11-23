@@ -1,11 +1,14 @@
+var dotenv = require('dotenv')
+dotenv.load()
 var AWS = require('aws-sdk')
-var crud = require('./database.js')
 
 // Set the endpoint to your local machine.
-AWS.config.update({region: 'eu-ireland', endpoint: 'http://localhost:8000'});
+AWS.config.update({region: process.env.AWS_REGION, endpoint: process.env.AWS_ENDPOINT});
 
 // Initialise a new database locally
 var Dynamo = new AWS.DynamoDB();
+
+var crud = require('./database.js')
 
 // Create a line-status table. 
 var tableParams = {
@@ -41,12 +44,14 @@ function createTableAndRecord(params){
         resolve(data)
       }
     })
+  }).then(data => {
+    return crud.write(recordParams, 'line-status').then(msg => {
+      console.log('DONE!');
+    })
   })
 }
 
-createTableAndRecord(tableParams).then(res => {
-  crud.write(recordParams, 'line-status')
-})
+createTableAndRecord(tableParams)
 
 
 // // Create the table.
