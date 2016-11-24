@@ -1,3 +1,6 @@
+// THIS MODULE INTERACTS WITH LINE OBJECTS IN THE DATABASE
+
+
 var db = require('./database.js')
 const debug = require('debug')('line')
 

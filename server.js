@@ -16,6 +16,7 @@ var LineStatus = require('./lib/LineStatus.js');
 var SupportedLines = require('./lib/SupportedLines.js')();
 var database = require('./models/database.js')
 
+LineStatus.run("northern")
 
 // RENDER A BASIC HOMEPAGE AT ROOT 
 //TODO: extract out the rendering stuff to a separate module!
@@ -31,9 +32,12 @@ app.get('/', (req, res) => {
   res.send(title + links(SupportedLines))
 })
 
+// TODO: THIS ISN'T WORKING!!!
+
 app.get('/lines/:id', (req, res, next) => {
-  LineStatus.updateStatus(req.params.id).then(data => {
-    res.send(data)
+  LineStatus.sendScoreToClient(req.params.id, 'line-status').then(data => {
+    debug("data is: " + data)
+    res.send(data.toString())
   })
 })
 
