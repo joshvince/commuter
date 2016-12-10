@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "setup-db": "node models/setup.js",
     "start-dynamo": "cd ~/amazondynamodb;java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb",
-    "reset-db": "aws dynamodb delete-table --table-name line-status --endpoint-url http://localhost:8000; node models/setup.js"
+    "reset-db": "aws dynamodb delete-table --table-name line-status --endpoint-url http://localhost:8000; node models/setup.js",
+    "debug-start": "DEBUG=* node server.js",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",

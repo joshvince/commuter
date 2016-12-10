@@ -1,0 +1,7 @@
+TFL_APP_KEY=tlf app key
+TFL_APP_ID=tfl app id
+TFL_SERVER=http://localhost:5000
+TFL_SERVER=https://api.tfl.gov.uk
+DYNAMO_DIR=~/amazondynamodb
+AWS_REGION="eu-ireland"
+AWS_ENDPOINT=http://localhost:8000
