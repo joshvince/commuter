@@ -32,8 +32,6 @@ app.get('/', (req, res) => {
   res.send(title + links(SupportedLines))
 })
 
-// TODO: THIS ISN'T WORKING!!!
-
 app.get('/lines/:id', (req, res, next) => {
   LineStatus.sendScoreToClient(req.params.id, 'line-status').then(data => {
     debug("data is: " + data)
