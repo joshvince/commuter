@@ -12,14 +12,15 @@ app.use(morgan('dev'))
 var fakeTflServer = require('./fakeTflServer.js')
 fakeTflServer();
 
+var Tfl = require('./lib/Tfl.js')
 var LineStatus = require('./lib/LineStatus.js');
 var SupportedLines = require('./lib/SupportedLines.js')();
 var database = require('./models/database.js')
 
-LineStatus.run("northern")
+Tfl.poll("northern")
 
 // RENDER A BASIC HOMEPAGE AT ROOT 
-//TODO: extract out the rendering stuff to a separate module!
+//TODO: remove this as no one should be hitting this endpoint.
 app.get('/', (req, res) => {
   var title = `<h1> Tube Status </h1><br>`
 
@@ -32,12 +33,18 @@ app.get('/', (req, res) => {
   res.send(title + links(SupportedLines))
 })
 
+/*
+API:
+The /lines/:id endpoint returns an object containing two fields:
+object.current is the latest status, which is fetched from the TFL API when the request is made
+object.lastHouse is an aggregated description of the last hour's service statuses.
+*/
 app.get('/lines/:id', (req, res, next) => {
-  LineStatus.sendScoreToClient(req.params.id, 'line-status').then(data => {
-    debug("data is: " + data)
-    res.send(data.toString())
+  LineStatus.getStatus(req.params.id).then(data => {
+    res.send(data)
   })
 })
+
 
 // ERROR HANDLER
 app.use((err, req, res, next) => {
@@ -45,6 +52,6 @@ app.use((err, req, res, next) => {
   res.status(500).send("Oops! Something went wrong")
 })
 
-app.listen(3000, () => {
-  console.log("Listening on port 3000")
+app.listen(3001, () => {
+  console.log("Listening on port 3001")
 })
