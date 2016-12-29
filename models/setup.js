@@ -1,3 +1,6 @@
+/*
+This module seeds the database with an initial table and blank line values
+*/
 var dotenv = require('dotenv')
 dotenv.load()
 
@@ -9,32 +12,16 @@ AWS.config.update({region: process.env.AWS_REGION, endpoint: process.env.AWS_END
 var Dynamo = new AWS.DynamoDB();
 // import crud functions
 var crud = require('./database.js')
-// Create a line-status table.
-var tableParams = {
-  TableName: "line-status",
-  KeySchema: [
-    { AttributeName: "name", KeyType: "HASH"}
-  ],
-  AttributeDefinitions: [
-    {AttributeName: "name", AttributeType: "S"}
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 10,
-    WriteCapacityUnits: 10
-  }
-};
 
-// TODO: delete this once the createLineData function is finished.
-var recordParams = {
-  name: "northern",
-  info: {
-    scoreArray: '[]'
-  }
-}
+/*
+Seeds the database with a `line-status` table and (blank) Line records.
+*/
+function seed() {
+  var tableParams = lineStatusTable();
+  var recordsParams = createLineData();
 
-function createTableAndRecord(params){
   return new Promise((resolve, reject) => {
-    Dynamo.createTable(params, function(err, data){
+    Dynamo.createTable(tableParams, function(err, data){
       if (err) {
         console.error(`Unable to create Table. Error JSON: `, JSON.stringify(err, null, 2));
         reject(err)
@@ -45,19 +32,28 @@ function createTableAndRecord(params){
       }
     })
   }).then(data => {
-    return crud.write(recordParams, 'line-status').then(msg => {
-      console.log('DONE!');
+    recordsParams.forEach(obj => {
+      return crud.write(obj, 'line-status').then(msg => {
+        console.log("ADDED RECORD")
+      }).catch(err => { console.log(err)})
     })
   })
 }
 
-createTableAndRecord(tableParams)
-
-/*
-Seeds the database with a `line-status` table and (blank) Line records.
-*/
-function seed() {
-
+function lineStatusTable() {
+  return {
+    TableName: "line-status",
+    KeySchema: [
+      { AttributeName: "id", KeyType: "HASH"}
+    ],
+    AttributeDefinitions: [
+      {AttributeName: "id", AttributeType: "S"}
+    ],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 10,
+      WriteCapacityUnits: 10
+    }
+  }
 }
 
 /*
@@ -76,10 +72,12 @@ function createLineData() {
 
 function lineDbObject(obj) {
   return {
-    name: obj.name,
     id: obj.id,
     info: {
-      scoreArray: []
+      name: obj.name,
+      scoreArray: '[]'
     }
   }
 }
+
+seed();
