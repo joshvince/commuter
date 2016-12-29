@@ -1,17 +1,6 @@
 // THIS MODULE INTERACTS WITH LINE OBJECTS IN THE DATABASE
-
-
 var db = require('./database.js')
 const debug = require('debug')('line')
-
-function initialise(name){
-  return {
-    name: name,
-    info: {
-      scoreArray: null
-    }
-  }
-}
 
 function updateStatus(newValue, itemName, tableName){
   return getScoreArray(itemName, tableName).then(array => {
@@ -21,11 +10,10 @@ function updateStatus(newValue, itemName, tableName){
   })
 }
 
-function getScoreArray(itemName, tableName){
-  var item = {name: itemName}
+function getScoreArray(itemId, tableName){
+  var item = {id: itemId}
   return db.read(item, tableName).then(data => {
     var array = data.Item.info.scoreArray
-    debug("data is: " + JSON.stringify(array, null, 2))
     return array
   })
 }
@@ -40,8 +28,8 @@ function buildScoreArray(newValue, arrayString){
   return array
 }
 
-function updateArrayInDb(array, itemName, tableName){
-  var item = {name: itemName}
+function updateArrayInDb(array, itemId, tableName){
+  var item = {id: itemId}
   var stringyArray = JSON.stringify(array)
   var expr = "set info.scoreArray = :s"
   var values = { ":s": stringyArray }
