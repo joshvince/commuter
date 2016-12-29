@@ -45,6 +45,15 @@ app.get('/lines/:id', (req, res, next) => {
   })
 })
 
+/*
+API:
+The /lines endpoint returns an array of Line objects.
+Each supported line (currently in the database) has an object with two attributes:
+`name` and `id`
+*/
+app.get('/lines', (req, res, next) => {
+  res.send(SupportedLines)
+})
 
 // ERROR HANDLER
 app.use((err, req, res, next) => {
