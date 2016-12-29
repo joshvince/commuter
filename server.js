@@ -17,9 +17,9 @@ var LineStatus = require('./lib/LineStatus.js');
 var SupportedLines = require('./lib/SupportedLines.js')();
 var database = require('./models/database.js')
 
-// POLL TFL FOR NORTHERN LINE status
-// TODO: THIS SHOULD POLL FOR EACH LINE, NOT JUST THE NORTHERN LINE
-Tfl.poll("northern")
+// POLL TFL FOR THE STATUS OF EACH OF THE LINES
+var lineIds = SupportedLines.map(el => { return el.id })
+Tfl.poll(lineIds)
 
 // RENDER A BASIC HOMEPAGE AT ROOT
 //TODO: remove this as no one should be hitting this endpoint.
