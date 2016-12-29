@@ -17,19 +17,19 @@ var LineStatus = require('./lib/LineStatus.js');
 var SupportedLines = require('./lib/SupportedLines.js')();
 var database = require('./models/database.js')
 
+// POLL TFL FOR NORTHERN LINE status
+// TODO: THIS SHOULD POLL FOR EACH LINE, NOT JUST THE NORTHERN LINE
 Tfl.poll("northern")
 
-// RENDER A BASIC HOMEPAGE AT ROOT 
+// RENDER A BASIC HOMEPAGE AT ROOT
 //TODO: remove this as no one should be hitting this endpoint.
 app.get('/', (req, res) => {
   var title = `<h1> Tube Status </h1><br>`
-
   function links(lines){
     return lines.map((el) =>{
-      return `<a href="/lines/${el.lowercase}">${el.name} Line</a><br>`
+      return `<br><a href="/lines/${el.id}">${el.name} Line</a>`
     })
   }
-  
   res.send(title + links(SupportedLines))
 })
 

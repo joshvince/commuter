@@ -1,20 +1,19 @@
 var dotenv = require('dotenv')
 dotenv.load()
-var AWS = require('aws-sdk')
 
+// NOTE: ensure you have aws-cli on your machine!
+var AWS = require('aws-sdk')
 // Set the endpoint to your local machine.
 AWS.config.update({region: process.env.AWS_REGION, endpoint: process.env.AWS_ENDPOINT});
-
 // Initialise a new database locally
 var Dynamo = new AWS.DynamoDB();
-
+// import crud functions
 var crud = require('./database.js')
-
-// Create a line-status table. 
+// Create a line-status table.
 var tableParams = {
   TableName: "line-status",
   KeySchema: [
-    { AttributeName: "name", KeyType: "HASH"} 
+    { AttributeName: "name", KeyType: "HASH"}
   ],
   AttributeDefinitions: [
     {AttributeName: "name", AttributeType: "S"}
@@ -25,6 +24,7 @@ var tableParams = {
   }
 };
 
+// TODO: delete this once the createLineData function is finished.
 var recordParams = {
   name: "northern",
   info: {
@@ -53,20 +53,33 @@ function createTableAndRecord(params){
 
 createTableAndRecord(tableParams)
 
+/*
+Seeds the database with a `line-status` table and (blank) Line records.
+*/
+function seed() {
 
-// // Create the table.
-// Dynamo.createTable(params, function(err, data){
-//   if (err) {
-//     console.error(`Unable to create Table. Error JSON: `, JSON.stringify(err, null, 2));
-//   }
-//   else {
-//     console.log(`Created table. Table description JSON: `, JSON.stringify(data, null, 2));
-//     return data
-//   }
-// })
+}
 
+/*
+This function creates an array of Tube Line objects ready to be written to the db.
+The `lines` var is actually an array of objects which was created by the module
+`SupportedLines.js` in `~/lib`. See documentation there for info on how this
+is created.
+*/
+function createLineData() {
+  // import supported line data (as an array of objects)
+  var lines = require('../lib/SupportedLines.js')();
+  return lines.map(obj => {
+    return lineDbObject(obj)
+  })
+}
 
-
-// // Create a blank record in the table
-// crud.write(params, 'line-status');
-
+function lineDbObject(obj) {
+  return {
+    name: obj.name,
+    id: obj.id,
+    info: {
+      scoreArray: []
+    }
+  }
+}

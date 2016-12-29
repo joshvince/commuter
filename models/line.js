@@ -22,6 +22,7 @@ function updateStatus(newValue, itemName, tableName){
 }
 
 function getScoreArray(itemName, tableName){
+  //TODO: `name` should now be `id`
   var item = {name: itemName}
   return db.read(item, tableName).then(data => {
     var array = data.Item.info.scoreArray
