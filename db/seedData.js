@@ -64,5 +64,7 @@ const lineStatusSeeds = {
 
 module.exports = {
   tables: tables,
-  records: [lineStatusSeeds, feedbackSeeds]
+  records: [lineStatusSeeds, feedbackSeeds],
+  lineStatusSeeds: lineStatusSeeds,
+  feedbackSeeds: feedbackSeeds
 }
