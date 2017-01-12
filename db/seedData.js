@@ -19,10 +19,10 @@ const tables = [
   {
     TableName: "feedback",
     KeySchema: [
-      { AttributeName: "time", KeyType: "HASH"}
+      { AttributeName: "timestamp", KeyType: "HASH"}
     ],
     AttributeDefinitions: [
-      {AttributeName: "time", AttributeType: "S"}
+      {AttributeName: "timestamp", AttributeType: "S"}
     ],
     ProvisionedThroughput: {
       ReadCapacityUnits: 10,

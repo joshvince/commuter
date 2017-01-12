@@ -42,7 +42,7 @@ If you have this local variable, you'll be calling your fake TFL server rather t
 
 ## API
 
-**`/lines`**  
+GET **`/lines`**  
 
 This endpoint will return a JSON array of available line objects.  
 Each object is an `id` and a `name`. Only lines that are contained in this response are being tracked by Commuter, and you can hit the relevant `/lines/:id` endpoint to get the score.  
@@ -50,9 +50,31 @@ Each object is an `id` and a `name`. Only lines that are contained in this respo
 *Example response:*  
 `[{"name": "Northern", "id": "northern"}, {"name": "Victoria", "id": "victoria"}]`  
 
-**`/lines/:id`**
+GET **`/lines/:id`**
 
 This endpoint returns a JSON object containing a `current` status for the given line as well as a `lastHour` aggregate "score". This aggregate score is a sentence that outlines the level of delays/closures on the line in the last 60 minutes.  
 
 *Example response:*  
 `{"current": "Minor Delays", "lastHour": "Lots of Problems"}`
+
+POST **`lines/feedback`**  
+
+This endpoint allows a client to post feedback data to help improve commuter. The POST data should
+be JSON in the following format:
+```
+{
+  line: {
+    id: "string"
+  },
+  feedback: {
+    timestamp: "string",
+    feedback: boolean
+  },
+  display: {
+    currentStatus: "string",
+    historicStatus: "string"
+  },
+  raw: [array]
+}
+```
+Currently, commuter returns a terse response, just a 200 status code and a tiny string. Sorry about that.
