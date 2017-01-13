@@ -40,8 +40,8 @@ app.get('/', (req, res) => {
 API:
 The /lines/:id endpoint returns an object containing three fields:
 object.current is the latest status, which is fetched from the TFL API when the request is made
-object.lastHouse is an aggregated description of the last hour's service statuses.
-object.raw is the raw array returned by the DB
+object.lastHour is an aggregated description of the last hour's service statuses.
+object.raw is an array of the latest code and the 12 previous codes from the DB.
 */
 app.get('/lines/:id', (req, res) => {
   LineStatus.getStatus(req.params.id).then(data => {
