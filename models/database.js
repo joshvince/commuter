@@ -2,7 +2,7 @@ var dotenv = require('dotenv')
 dotenv.load()
 var AWS = require('aws-sdk');
 AWS.config.update({
-  region: process.env.AWS_REGION, 
+  region: process.env.AWS_REGION,
   endpoint: process.env.AWS_ENDPOINT
 })
 
@@ -25,7 +25,6 @@ function writeToDB(item, table){
         }
         else {
           console.log("created record");
-          debug(`the record created was: \n` + JSON.stringify(result))
           resolve(result);
         }
       })

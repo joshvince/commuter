@@ -2,6 +2,16 @@
 var db = require('./database.js')
 const debug = require('debug')('line')
 
+function schema() {
+  return {
+    id: "string",
+    info: {
+      name: "string",
+      scoreArray: "stringyarray"
+    }
+  }
+}
+
 function updateStatus(newValue, itemName, tableName){
   return getScoreArray(itemName, tableName).then(array => {
     return buildScoreArray(newValue, array)
@@ -39,6 +49,7 @@ function updateArrayInDb(array, itemId, tableName){
 }
 
 module.exports = {
+  schema: schema,
   buildScoreArray: buildScoreArray,
   updateArrayInDb: updateArrayInDb,
   getScoreArray: getScoreArray,
