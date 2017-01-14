@@ -6,13 +6,16 @@ var jsonParser = bodyParser.json();
 var morgan = require('morgan');
 const debug = require('debug')('server');
 var app = express();
+var port = process.env.PORT || 3001
 
-// LOG THE REQUESTS IN DEV MODE FOR NOW
+// TO LOG THE REQUESTS IN DEV MODE
+// uncomment the following line
 app.use(morgan('dev'))
 
-// START THE FAKETFLSERVER
-var fakeTflServer = require('./fakeTflServer.js');
-fakeTflServer();
+// TO START THE FAKETFLSERVER (For dev purposes)
+// uncomment these next two lines!
+// var fakeTflServer = require('./fakeTflServer.js');
+// fakeTflServer();
 
 var Tfl = require('./lib/Tfl.js')
 var LineStatus = require('./lib/LineStatus.js');
@@ -75,6 +78,6 @@ app.use((err, req, res, next) => {
   res.status(500).send("Oops! Something went wrong")
 })
 
-app.listen(3001, () => {
-  console.log("Listening on port 3001")
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`)
 })

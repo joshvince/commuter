@@ -1,6 +1,8 @@
 /*
 This module seeds the database with tables and seed values.
 It draws the table data and record data from `./seedData.js`
+
+WARNING: it is ONLY for use in development on local machines.
 */
 var dotenv = require('dotenv')
 dotenv.load()

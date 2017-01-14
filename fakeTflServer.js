@@ -5,6 +5,7 @@ module.exports = function(){
   var morgan = require('morgan')
   const debug = require('debug')('tflServer')
   var app = express()
+  var port = process.env.TFL_PORT || 5001
 
   app.use(morgan('dev'))
 
@@ -18,8 +19,8 @@ module.exports = function(){
     res.status(500).send("Oops! Something went wrong")
   })
 
-  app.listen(5000, () => {
-    console.log("Fake TFL is listening on port 5000")
+  app.listen(port, () => {
+    console.log(`Fake TFL is listening on port ${port}`)
   })
 
   function sendDelay(){

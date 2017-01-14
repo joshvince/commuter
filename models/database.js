@@ -1,10 +1,15 @@
 var dotenv = require('dotenv')
 dotenv.load()
 var AWS = require('aws-sdk');
+AWS.config.region = process.env.AWS_REGION
+
+// following is for local development (you have to set local endpoint for local)
 AWS.config.update({
-  region: process.env.AWS_REGION,
-  endpoint: process.env.AWS_ENDPOINT
+  region: process.env.AWS_REGION
+  // Following endpoint is only necessary for local development
+  // endpoint: process.env.AWS_ENDPOINT
 })
+
 
 const debug = require('debug')('database')
 const Dynamo = new AWS.DynamoDB.DocumentClient();

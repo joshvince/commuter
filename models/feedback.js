@@ -1,6 +1,7 @@
 // This module interacts with feedback objects in the database
 var db = require('./database.js')
 const debug = require('debug')('feedback')
+var feedbackTable = process.env.FEEDBACK_TABLE
 
 function schema() {
   return {
@@ -28,7 +29,7 @@ function lineStatusFeedbackObj(data){
 
 function writeToDb(data) {
   var obj = lineStatusFeedbackObj(data)
-  db.write(obj, 'feedback')
+  db.write(obj, feedbackTable)
 }
 
 module.exports = {

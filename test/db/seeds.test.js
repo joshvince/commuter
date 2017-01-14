@@ -31,7 +31,7 @@ describe('Seeds', function() {
     });
     it('should seed the table with a key present in the schema', function() {
       var tableObj = seedData.tables.find(obj => {
-        return obj.TableName == 'line-status'
+        return obj.TableName == process.env.LINE_STATUS_TABLE
       })
       var keyNames = tableObj.KeySchema.map(obj => {
         return obj.AttributeName
