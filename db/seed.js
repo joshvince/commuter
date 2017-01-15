@@ -9,13 +9,14 @@ dotenv.load()
 // NOTE: ensure you have aws-cli on your machine!
 var AWS = require('aws-sdk')
 AWS.config.region = process.env.AWS_REGION
-var Dynamo = new AWS.DynamoDB();
 
 /*
 LOCAL ONLY! Uncomment the line below to set the endpoint to your local machine.
 Make sure you have your own env var set here, or you'll be connecting to aws.
 */
-// AWS.config.endpoint = process.env.AWS_ENDPOINT
+AWS.config.update({endpoint: process.env.AWS_ENDPOINT});
+
+var Dynamo = new AWS.DynamoDB();
 
 // import crud functions
 var crud = require('../models/database.js')
@@ -121,7 +122,7 @@ function run(seedData) {
       }).catch(err => {
         console.log(err)
       })
-    }, 5000)
+    }, 10000)
   })
 }
 
