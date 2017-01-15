@@ -1,17 +1,15 @@
 var dotenv = require('dotenv')
 dotenv.load()
+const debug = require('debug')('database')
 var AWS = require('aws-sdk');
 AWS.config.region = process.env.AWS_REGION
-
-// following is for local development (you have to set local endpoint for local)
-AWS.config.update({
-  region: process.env.AWS_REGION
-  // Following endpoint is only necessary for local development
-  // endpoint: process.env.AWS_ENDPOINT
-})
-
-
-const debug = require('debug')('database')
+/*
+LOCAL ONLY: set the endpoint in an env var (probably localhost:8000) if you are
+working on a local version of dynamodb.
+Otherwise, please ensure you are connecting to AWS's `commuter-dev` environment
+and not production.
+*/
+//AWS.config.endpoint = process.env.AWS_ENDPOINT
 const Dynamo = new AWS.DynamoDB.DocumentClient();
 
 function writeToDB(item, table){
@@ -81,8 +79,34 @@ function updateInDB(item, updateExpression, expressionValues, table){
   })
 }
 
+/*
+This one has a unique API: it must be given a JSON where each key is a TableName.
+Each associated value can be an array of objects that are either:
+PutRequest: {Item: {object_to_be_written}} which will then add the given object
+to the table.
+DeleteRequest: {Key: {object_containing_key}} which will find the given object
+by its given key and delete it from the table.
+
+It does this for each item in each table. It is exposed as `batchUpdate`
+*/
+function batchUpdate(itemJson) {
+  return new Promise((resolve, reject) => {
+    Dynamo.batchWrite(itemJson, (err, data) => {
+      if (err) {
+        debug(`Received an error` + err)
+        reject(err);
+      }
+      else {
+        debug(`successfully Batch Wrote and received this data back: ` + JSON.stringify(data))
+        resolve(data);
+      }
+    })
+  });
+}
+
 module.exports = {
   write: writeToDB,
   read: readFromDB,
-  update: updateInDB
+  update: updateInDB,
+  batchUpdate: batchUpdate
 }
