@@ -9,7 +9,8 @@ working on a local version of dynamodb.
 Otherwise, please ensure you are connecting to AWS's `commuter-dev` environment
 and not production.
 */
-//AWS.config.endpoint = process.env.AWS_ENDPOINT
+AWS.config.update({endpoint: process.env.AWS_ENDPOINT});
+
 const Dynamo = new AWS.DynamoDB.DocumentClient();
 
 function writeToDB(item, table){
