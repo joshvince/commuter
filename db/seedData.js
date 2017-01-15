@@ -1,9 +1,12 @@
 // SEEDS FOR THE DB.
 
+const lineStatusTableName = process.env.LINE_STATUS_TABLE
+const feedbackTableName = process.env.FEEDBACK_TABLE
+
 const tables = [
   // CREATE LINE-STATUS TABLE
   {
-    TableName: "line-status",
+    TableName: lineStatusTableName,
     KeySchema: [
       { AttributeName: "id", KeyType: "HASH"}
     ],
@@ -17,7 +20,7 @@ const tables = [
   },
   // CREATE FEEDBACK TABLE
   {
-    TableName: "feedback",
+    TableName: feedbackTableName,
     KeySchema: [
       { AttributeName: "timestamp", KeyType: "HASH"}
     ],
@@ -31,19 +34,7 @@ const tables = [
   }
 ]
 
-const feedbackSeeds = {
-  TableName: 'feedback',
-  records: [
-    {
-      lineId: "northern",
-      scoreArray: [10,10,10,10,10,10,10,10,10,10,10,10],
-      timestamp: "2017-01-12T13:45:08.577Z",
-      display: {"current":"Good Service","historic":"No problems"},
-      feedback: true
-    }
-  ]
-}
-
+// GENERATE OBJECTS FOR EACH OF THE LINES SUPPORTED:
 function generateLineData(lineObj) {
     return {
       id: lineObj.id,
@@ -53,18 +44,50 @@ function generateLineData(lineObj) {
       }
     }
 }
+var lineObjects = require('../lib/SupportedLines.js')().map(obj =>{
+  return generateLineData(obj)
+});
 
-var lines = require('../lib/SupportedLines.js')();
-var lineObjects = lines.map(obj => { return generateLineData(obj) })
+// GENERATE A TEST FEEDBACK OBJECT
+const feedbackObjects = [
+  {
+    lineId: "northern",
+    scoreArray: [10,10,10,10,10,10,10,10,10,10,10,10],
+    timestamp: "2017-01-12T13:45:08.577Z",
+    display: {
+      "current": "Good Service",
+      "historic":"No problems"
+    },
+    feedback: true
+  }
+]
 
-const lineStatusSeeds = {
-  TableName: 'line-status',
-  records: lineObjects
+// ADD EACH OF THESE UNDER THE RELEVANT TABLE NAME TO THE CORRECT FORMAT ACCEPTED
+// BY DYNAMODB'S BATCHWRITE FUNCTION.
+// SPEC HERE: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#batchWrite-property
+
+function generateBatchWriteItemJSON(lineStatusObjs, feedbackObjs) {
+  return {
+    "RequestItems": {
+      [lineStatusTableName]: generateOneBatchArray(lineStatusObjs),
+      [feedbackTableName]: generateOneBatchArray(feedbackObjs)
+    }
+  }
 }
+
+function generateOneBatchArray(data) {
+  return data.map(obj => {
+    return {
+      "PutRequest": {
+        "Item": obj
+      }
+    }
+  })
+}
+
+var batchItems = generateBatchWriteItemJSON(lineObjects, feedbackObjects)
 
 module.exports = {
   tables: tables,
-  records: [lineStatusSeeds, feedbackSeeds],
-  lineStatusSeeds: lineStatusSeeds,
-  feedbackSeeds: feedbackSeeds
+  batchItems: batchItems
 }

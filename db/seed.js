@@ -2,21 +2,26 @@
 This module seeds the database with tables and seed values.
 It draws the table data and record data from `./seedData.js`
 
-WARNING: it is ONLY for use in development on local machines.
+NOTE: it is ONLY for use in development environments (commuter-dev or local)
 */
 var dotenv = require('dotenv')
 dotenv.load()
-
-var seeds = require('./seedData.js');
-
 // NOTE: ensure you have aws-cli on your machine!
 var AWS = require('aws-sdk')
-// Set the endpoint to your local machine.
-AWS.config.update({region: process.env.AWS_REGION, endpoint: process.env.AWS_ENDPOINT});
-// Initialise a new database locally
+AWS.config.region = process.env.AWS_REGION
 var Dynamo = new AWS.DynamoDB();
+
+/*
+LOCAL ONLY! Uncomment the line below to set the endpoint to your local machine.
+Make sure you have your own env var set here, or you'll be connecting to aws.
+*/
+// AWS.config.endpoint = process.env.AWS_ENDPOINT
+
 // import crud functions
 var crud = require('../models/database.js')
+
+// import the seeds
+var seeds = require('./seedData.js');
 
 function checkForTable(tableData) {
   return new Promise(function(resolve, reject) {
@@ -62,46 +67,83 @@ function createTable(tableData) {
   });
 }
 
-function getRecordsFromSeeds(seedRecords, tableName) {
-  var recordsObj = seedRecords.find(obj => {
-    return obj.TableName == tableName
-  })
-  return recordsObj.records
+function checkTableStatus(tableData) {
+  return new Promise(function(resolve, reject) {
+    Dynamo.describeTable(tableData, function(err, data){
+      if (err) {
+        console.error(`There was no table by that name!`, JSON.stringify(err, null, 2));
+        reject(err)
+      }
+      else {
+        console.log(`Table status is`, JSON.stringify(data, null, 2));
+        resolve(data)
+      }
+    })
+  });
 }
 
-function addRecordsToTable(recordsArray, tableName) {
-  recordsArray.forEach(obj => {
-    crud.write(obj, tableName)
+function dropAndCreateTable(tableData) {
+  return new Promise(function(resolve, reject) {
+    checkForTable(tableData).then(exists => {
+      if (exists) {
+        console.log("\nfound an existing table. Deleting...\n")
+        destroyTable({TableName: tableData.TableName}).then(msg => {
+          console.log(`\n\nwaiting three seconds for AWS to get their act together before we recreate the table...\n\n`);
+          this.setTimeout(function(){
+            createTable(tableData).then(res => {
+              resolve(res);
+            })
+          }, 3000)
+        })
+      }
+      else {
+        console.log(`\ncreating a table...\n`);
+        createTable(tableData).then(res => {
+          resolve(res);
+        })
+      }
+    })
+  });
+}
+
+function dropAndCreateAllTables(tablesArray) {
+  return tablesArray.map(tableObj => {
+    return dropAndCreateTable(tableObj)
   })
 }
 
 function run(seedData) {
-  seedData.tables.forEach(table => {
-    checkForTable(table).then(exists => {
-      if (exists) {
-        destroyTable({TableName: table.TableName}).then(msg => {
-          createTable(table).then(res => {
-            var records = getRecordsFromSeeds(seedData.records, table.TableName)
-            addRecordsToTable(records, table.TableName)
-          })
-        })
-      }
-      else {
-        createTable(table).then(res => {
-          var records = getRecordsFromSeeds(seedData.records, table.TableName)
-          addRecordsToTable(records, table.TableName)
-        })
-      }
-    })
+  var tableOperators = dropAndCreateAllTables(seedData.tables)
+  Promise.all(tableOperators).then(results => {
+    this.setTimeout(function(){
+      return crud.batchUpdate(seedData.batchItems).then(msg => {
+        console.log(msg)
+      }).catch(err => {
+        console.log(err)
+      })
+    }, 5000)
   })
 }
 
 /*
 WARNING!
 This will completely destroy your database and reseed it.
-For each table provided in the `seeds.js` file:
-This function checks whether it exists. If it does, it blows it away.
-It then re-seeds each table with records with matching TableName key in
-`seeds.js` file.
+As a failsafe, I am including a 10 second timeout here to allow you to undo.
+If you get the message: "You are connecting to AWS's servers" AND YOU DON'T INTEND
+ON WIPING THE DEV SERVER then you can cancel the operation within 10 seconds.
 */
-run(seeds);
+// run(seeds);
+function failsafe(seedData) {
+  if (AWS.config.endpoint != 'http://localhost:8000') {
+    console.log(`You are destroying the actual development server data.\n
+      You have 5 seconds to abort...`)
+    setTimeout(function(){
+      run(seedData)
+    }, 3000);
+  }
+  else {
+    run(seedData)
+  }
+}
+
+failsafe(seeds)
