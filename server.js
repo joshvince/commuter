@@ -25,7 +25,20 @@ var Feedback = require('./models/feedback.js');
 
 // POLL TFL FOR THE STATUS OF EACH OF THE LINES
 var lineIds = SupportedLines.map(el => { return el.id })
-Tfl.poll(lineIds)
+
+
+
+
+
+
+// Tfl.poll(lineIds)
+
+
+
+
+
+
+
 
 // RENDER A BASIC HOMEPAGE AT ROOT
 //TODO: remove this as no one should be hitting this endpoint.
