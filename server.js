@@ -1,3 +1,4 @@
+// 3rd Party Modules
 var dotenv = require('dotenv');
 dotenv.load();
 var express = require('express');
@@ -6,50 +7,40 @@ var jsonParser = bodyParser.json();
 var morgan = require('morgan');
 const debug = require('debug')('server');
 var app = express();
+
+// Environment Variables
 var port = process.env.PORT || 3001
 
-// TO LOG THE REQUESTS IN DEV MODE
-// uncomment the following line
-app.use(morgan('dev'))
-
-// TO START THE FAKETFLSERVER (For dev purposes)
-// uncomment these next two lines!
-// var fakeTflServer = require('./fakeTflServer.js');
-// fakeTflServer();
-
+// Local Dependencies
 var Tfl = require('./lib/Tfl.js')
 var LineStatus = require('./lib/LineStatus.js');
 var SupportedLines = require('./lib/SupportedLines.js')();
 var database = require('./models/database.js');
 var Feedback = require('./models/feedback.js');
-
-// POLL TFL FOR THE STATUS OF EACH OF THE LINES
 var lineIds = SupportedLines.map(el => { return el.id })
 
+/*
+Local Development Set up
+*/
+// LOG THE REQUESTS IN DEV MODE
+app.use(morgan('dev'))
+// START THE FAKETFLSERVER
+// var fakeTflServer = require('./fakeTflServer.js');
+// fakeTflServer();
 
+/*
+Scheduled tasks
+*/
+// POLL TFL FOR THE STATUS OF EACH OF THE LINES EVERY 5 MINS
+Tfl.schedule(lineIds)
 
+// TODO: CREATE A TASK THAT RUNS EACH HOUR AND UPDATES WITH HISTORIC DATA
 
-
-
-// Tfl.poll(lineIds)
-
-
-
-
-
-
-
-
-// RENDER A BASIC HOMEPAGE AT ROOT
-//TODO: remove this as no one should be hitting this endpoint.
-app.get('/', (req, res) => {
-  var title = `<h1> Tube Status </h1><br>`
-  function links(lines){
-    return lines.map((el) =>{
-      return `<br><a href="/lines/${el.id}">${el.name} Line</a>`
-    })
-  }
-  res.send(title + links(SupportedLines))
+/*
+Server starts here
+*/
+app.get('/', (req,res) => {
+  res.send("SERVICE OK")
 })
 
 /*
