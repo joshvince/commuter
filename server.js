@@ -36,6 +36,17 @@ Tfl.schedule(lineIds)
 
 // TODO: CREATE A TASK THAT RUNS EACH HOUR AND UPDATES WITH HISTORIC DATA
 
+
+/*
+Middleware:
+*/
+// Allow CORS so that the web app can make requests.
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 /*
 Server starts here
 */
